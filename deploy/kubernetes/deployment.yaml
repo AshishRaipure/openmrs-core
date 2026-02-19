@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openmrs
+  namespace: openmrs
+  labels:
+    app: openmrs
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: openmrs
+  template:
+    metadata:
+      labels:
+        app: openmrs
+    spec:
+      containers:
+        - name: openmrs
+          image: openmrs/openmrs-core:2.5.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: openmrs-config
+                  key: DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: openmrs-config
+                  key: DB_PORT
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: openmrs-config
+                  key: DB_NAME
+            - name: DB_AUTO_UPDATE
+              valueFrom:
+                configMapKeyRef:
+                  name: openmrs-config
+                  key: DB_AUTO_UPDATE
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: openmrs-secrets
+                  key: DB_USERNAME
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: openmrs-secrets
+                  key: DB_PASSWORD
+          readinessProbe:
+            httpGet:
+              path: /openmrs/login.htm
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /openmrs/login.htm
+              port: 8080
+            initialDelaySeconds: 120
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 5
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: "2"
+              memory: 2Gi

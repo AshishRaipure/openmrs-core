@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: openmrs-config
+  namespace: openmrs
+data:
+  DB_HOST: mariadb.openmrs.svc.cluster.local
+  DB_PORT: "3306"
+  DB_NAME: openmrs
+  DB_AUTO_UPDATE: "true"
