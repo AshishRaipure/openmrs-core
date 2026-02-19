@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: openmrs
+  namespace: openmrs
+  labels:
+    app: openmrs
+spec:
+  type: ClusterIP
+  selector:
+    app: openmrs
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
